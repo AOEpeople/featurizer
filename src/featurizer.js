@@ -1,6 +1,6 @@
 var $;
 
-module.exports = function($element, featureFunctionsArray) {
+module.exports = ($element, featureFunctionsArray) => {
     if (!featureFunctionsArray) {
         console.log('No features passed. Nothing todo. Bye.');
         return;
@@ -14,12 +14,11 @@ module.exports = function($element, featureFunctionsArray) {
     // get used jQuery from jQuery element
     $ = $element.constructor;
 
-    $element.find('[data-product-additional]').each(function(i, item) {
+    $element.find('[data-product-additional], [data-featurizer]').each((i, item) => {
         var $item = $(item);
-        var additionalDataJSON = $item.data('product-additional');
+        var additionalDataJSON = $item.data('product-additional') || $item.data('featurizer');
 
-        // TODO: Check if reverse() makes sense to get most important features to the top
-        $(featureFunctionsArray).each(function(i, feature) {
+        featureFunctionsArray.forEach(feature => {
             if (!feature.requiredFields) {
                 feature($item, additionalDataJSON);
             }
@@ -33,12 +32,11 @@ module.exports = function($element, featureFunctionsArray) {
 };
 
 function isJqueryObjectAndContainsElements($element) {
-    if ($element && $element.constructor && $element.constructor.fn && $element.constructor.fn.jquery) {
-        if ($element.length > 0) {
-            return true;
-        }
-    }
-    return false;
+    return ($element &&
+            $element.constructor &&
+            $element.constructor.fn &&
+            $element.constructor.fn.jquery &&
+            $element.length > 0) ? true : false;
 }
 
 function allRequiredFieldsFilled(feature, additionalDataJSON) {
